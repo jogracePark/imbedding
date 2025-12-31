@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+sentence-transformers
+torch # sentence-transformers의 의존성
+pydantic # fastapi의 의존성
