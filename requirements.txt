@@ -1,9 +1,4 @@
-# 기존
-torch==2.1.0
-torchvision==0.16.0
-torchaudio==2.1.0
-
-# Render용 권장
 torch==2.9.1
 torchvision==0.15.2
 torchaudio==2.9.1
+transformers==4.43.0
