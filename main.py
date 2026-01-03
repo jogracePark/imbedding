@@ -1,36 +1,31 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
+from fastapi import FastAPI, Request
+from transformers import pipeline
+import torch
+import os
 
-app = FastAPI(title="MiniLM-L6 Embedding API")
+app = FastAPI()
 
-# ------------------------
-# 모델 로딩 (Render 무료 tier에서 CPU만으로 가능)
-# ------------------------
-print("모델 로딩 중...")
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-print("모델 로딩 완료!")
+# --------------------
+# 로컬 임베딩 모델 설정
+# --------------------
+EMBEDDING_MODEL = "Xenova/paraphrase-multilingual-MiniLM-L12-v2"
 
-# ------------------------
-# 요청 형식
-# ------------------------
-class EmbeddingRequest(BaseModel):
-    text: str
+# 임베딩 파이프라인 초기화 (CPU)
+embedder = pipeline("feature-extraction", model=EMBEDDING_MODEL, device=-1)
 
-# ------------------------
-# 루트 헬스체크
-# ------------------------
-@app.get("/")
-def root():
-    return {"status": "ok"}
-
-# ------------------------
-# 임베딩 생성 엔드포인트
-# ------------------------
 @app.post("/embed")
-def embed(req: EmbeddingRequest):
-    try:
-        embedding = model.encode(req.text, normalize_embeddings=True)
-        return {"embedding": embedding.tolist()}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def embed_text(req: Request):
+    body = await req.json()
+    advice_text = body.get("advice_text", "")
+    
+    if not advice_text:
+        return {"error": "advice_text is required"}
+    
+    # 문장 임베딩 생성
+    output = embedder(advice_text, pooling="mean", normalize=True)
+    embedding_vector = output[0]  # 첫 번째 문장
+    return {"embedding": embedding_vector}
+
+@app.get("/")
+async def root():
+    return {"status": "ok"}
