@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 # 경량 CPU 임베딩 모델
-model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 @app.post("/embed")
 async def embed_text(req: Request):
