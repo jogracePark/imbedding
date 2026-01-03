@@ -4,8 +4,11 @@ import os
 
 app = FastAPI()
 
-# 경량 CPU 임베딩 모델
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# --------------------
+# 초경량 CPU 임베딩 모델
+# --------------------
+# MiniLM L3 계열: 20~25MB, 512MB RAM 환경에서도 안전
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L3-v2")
 
 @app.post("/embed")
 async def embed_text(req: Request):
@@ -15,7 +18,8 @@ async def embed_text(req: Request):
     if not advice_text:
         return {"error": "advice_text is required"}
     
-    embedding_vector = model.encode(advice_text).tolist()
+    # 한 문장씩 encode → 메모리 절약
+    embedding_vector = model.encode([advice_text])[0].tolist()
     return {"embedding": embedding_vector}
 
 @app.get("/")
