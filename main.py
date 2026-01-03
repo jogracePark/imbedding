@@ -1,13 +1,12 @@
 from fastapi import FastAPI, Request
 from sentence_transformers import SentenceTransformer
-import os
 
 app = FastAPI()
 
 # --------------------
 # 초경량 CPU 임베딩 모델
 # --------------------
-# MiniLM L3 계열: 20~25MB, 512MB RAM 환경에서도 안전
+# MiniLM L3 계열: ~20MB, 512MB RAM 안전
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L3-v2")
 
 @app.post("/embed")
